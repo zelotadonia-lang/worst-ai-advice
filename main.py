@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Worst AI Advice entry.
 
-Writes one line of the worst possible advice an AI could give
-(<=140 chars) to /output/entry.txt, deterministically: same bytes
-on every run.
+One line of the worst possible advice an AI could give, capped at 140
+characters. Writes the line to /output/entry.txt, deterministically:
+same bytes on every run.
 """
 import hashlib
 import os
@@ -15,10 +15,11 @@ OUTPUT_PATH = "/output/entry.txt"
 
 
 def validate(line):
-    """Check the line against the sealed scorer's gate, without asserts.
+    """Gate-check the line (1-140 chars, not only whitespace, one line).
 
-    Asserts vanish under python -O, so the gate is enforced with explicit
-    checks that always run, and failures name the broken rule.
+    Explicit checks, not asserts: asserts vanish under python -O, so the
+    gate is enforced with conditions that always run, and each failure
+    names the rule that broke.
     """
     if not 1 <= len(line) <= 140:
         raise ValueError(f"line is {len(line)} chars, gate needs 1-140")
@@ -28,14 +29,20 @@ def validate(line):
         raise ValueError("entry must be a single line")
 
 
-def main():
+def main(argv=None):
+    check_only = argv is not None and "--check" in argv
     try:
         validate(LINE)
     except ValueError as exc:
         print(f"invalid entry: {exc}", file=sys.stderr)
         raise SystemExit(1)
-    # Deterministic by construction: fixed constant, no randomness, no
-    # timestamps, explicit UTF-8 encoding, no trailing newline added.
+    if check_only:
+        # Validate only: report the line is gate-valid and stop, without
+        # touching /output/entry.txt.
+        print(f"entry valid: {len(LINE)} chars, within the 1-140 gate")
+        return
+    # Fixed constant, no randomness, no timestamps, explicit UTF-8,
+    # no trailing newline: deterministic by construction.
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     with open(OUTPUT_PATH, "w", encoding="utf-8", newline="") as f:
         f.write(LINE)
@@ -58,4 +65,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])

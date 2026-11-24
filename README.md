@@ -6,6 +6,10 @@
 
 One line of the worst possible advice an AI could give, written by a deterministic Python program for make.fun's "Worst AI Advice: The 48-Hour Tight Line Open" bounty.
 
+## How the line was chosen
+
+Twelve fresh one-liners were written, then a blind judge (given only the brief and the traits of past winners) compared them in pairs until one remained. The winner then passed a calibration gate against a previous one-line winner before it became the entry.
+
 ## Run it
 
 ```sh
